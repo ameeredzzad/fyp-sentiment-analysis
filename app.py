@@ -5,7 +5,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Malaysian economic sentiment", layout="wide")
 
-DATA_PATH = "data/processed/dashboard_data.csv"
+DATA_PATH = "data/results/dashboard_data.csv"
 MODEL_DIR = "final_model"          # optional: unzipped model folder, only for the "Try it" box
 COLORS = {"negative": "#e5534b", "neutral": "#8b8b85", "positive": "#6aa84f"}
 ORDER = ["negative", "neutral", "positive"]
