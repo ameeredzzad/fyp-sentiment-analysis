@@ -42,7 +42,7 @@ text_col = next((c for c in ["clean_text", "text"] if c in df.columns), None)
 h1, h2, h3 = st.columns([3, 2, 2])
 h1.title("Malaysian economic sentiment dashboard")
 rater = h2.radio("Show", ["Model predictions", "Human labels"], horizontal=True)
-only_conflict = h3.checkbox("US-Iran conflict period only (from 28 Feb 2026)", value=True)
+only_conflict = h3.checkbox("2026 period only (since 28 Feb 2026)", value=True)
 col = "model_label" if rater == "Model predictions" else "label"
 
 f1, f2 = st.columns([2, 2])
@@ -141,7 +141,10 @@ if os.path.isdir(MODEL_DIR):
         return pipeline("text-classification", model=MODEL_DIR, tokenizer=MODEL_DIR, top_k=None)
     txt = st.text_area("Type a tweet about the economy (Malay or English)")
     if st.button("Classify") and txt.strip():
-        for r in get_clf()(txt)[0]:
+        res = sorted(get_clf()(txt)[0], key=lambda r: r["score"], reverse=True)
+        if res[0]["score"] < 0.60:
+            st.warning(f"Uncertain: the top class is only {res[0]['score']:.0%}. Treat this prediction with caution.")
+        for r in res:
             st.write(f"{r['label'].capitalize()}: {r['score']:.0%}")
 else:
     st.caption("Optional: unzip final_model.zip into this folder (so a `final_model` folder sits next to app.py) and install "
@@ -149,5 +152,5 @@ else:
 
 # ---------- honest footer ----------
 st.caption("Predictions are out-of-fold (each tweet was predicted by a model that never saw it in training). "
-           "Macro F1 is about 0.58 and the neutral class is the weakest. About 70% of tweets come from news or official "
-           "accounts. Themes are keyword-based. Data: dashboard_data.csv in the project's GitHub repo.")
+           "Macro F1 is about 0.64 and the neutral class is still weaker than the others. About 63% of tweets come from "
+           "news or official accounts. Themes are keyword-based. Data: dashboard_data.csv in the project's GitHub repo.")
